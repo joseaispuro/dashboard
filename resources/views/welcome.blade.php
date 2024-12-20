@@ -14,7 +14,7 @@
     </head>
     <body id="app" style="margin-left: 70px;">
         <menu-bar></menu-bar>
-        <div class="container">
+        <div class="container-fluid">
             AQUI VA EL CONTENIDO
         </div>
         <hello-world></hello-world>
