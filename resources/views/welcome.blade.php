@@ -13,7 +13,6 @@
 
     </head>
     <body id="app" style="margin-left: 70px;">
-        SINCE
         <menu-bar></menu-bar>
         <hello-world></hello-world>
     </body>
