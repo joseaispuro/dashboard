@@ -1,9 +1,9 @@
 import './bootstrap';
 import { createApp } from 'vue';
-import HelloWorld from './components/HelloWorld.vue';
+import Predial from './components/Predial.vue';
 import MenuBar from './components/Menu.vue';
  
 createApp({})
-  .component('HelloWorld', HelloWorld)
+  .component('Predial', Predial)
   .component('MenuBar', MenuBar)
   .mount('#app')

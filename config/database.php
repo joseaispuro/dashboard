@@ -92,6 +92,36 @@ return [
             // 'encrypt' => env('DB_ENCRYPT', 'yes'),
             // 'trust_server_certificate' => env('DB_TRUST_SERVER_CERTIFICATE', 'false'),
         ],
+        
+        'predial_sadmun' => [
+            'driver'   => 'sqlsrv',
+            'host'     => env('MSSQL_HOST_OF', 'localhost'),
+            'database' => env('MSSQL_DATABASE_OF', 'forge'),
+            'username' => env('MSSQL_USERNAME_OF', 'forge'),
+            'password' => env('MSSQL_PASSWORD_OF', ''),
+            'charset'  => 'utf8',
+            'prefix'   => '',
+        ],
+
+        'predial' => [
+            'driver' => 'mysql',
+            'url' => env('DATABASE_URL'),
+            'host' => env('DB_HOST_PREDIAL', '127.0.0.1'),
+            'port' => env('DB_PORT_PREDIAL', '3306'),
+            'database' => env('DB_DATABASE_PREDIAL', 'forge'),
+            'username' => env('DB_USERNAME_PREDIAL', 'forge'),
+            'password' => env('DB_PASSWORD_PREDIAL', ''),
+            'unix_socket' => env('DB_SOCKET', ''),
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'strict' => true,
+            'engine' => null,
+            'options' => extension_loaded('pdo_mysql') ? array_filter([
+                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+            ]) : [],
+        ],
 
     ],
 

@@ -90,19 +90,6 @@
                 </li>  
             </ul>
         </nav>
-
-
-        <div class="container">
-            <div class="row">
-                <div class="col-md-4">
-                    AQUI VA UNA BARRA
-                </div>
-                <div class="col-md-4">
-                    AQI VA OTRA
-                </div>
-            </div>
-        </div>
-
         
 </template>
 <script setup>
