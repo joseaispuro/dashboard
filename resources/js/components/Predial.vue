@@ -111,8 +111,6 @@ function actualizar(){
 </script>
 
 
-
-
 <style scoped>
 h3{
   font-weight: bolder;
