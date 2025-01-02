@@ -36,13 +36,16 @@
 
             <div class="col-md-6 sombra">
                 <h5>Últimos 7 días</h5>
-
-          <LineWithLineChart :data="comparacion" />
             </div>
 
-             <div class="col-md-12 sombra" style="max-height:450px;">
+            <div class="col-md-12 sombra" style="max-height:450px;">
                 <h5>Distribución de Importes</h5>
-                <Doughnut :data="comparacion" />
+                <Doughnut :data="comparacion" style="max-height:410px;"/>
+            </div>
+
+            <div class="col-md-12 sombra" style="max-height:450px;">
+                <h5>Distribución de Importes</h5>
+                <Doughnut :data="comparacion" style="max-height:410px;"/>
             </div>
            
           </div>
@@ -79,7 +82,7 @@
 
 <script setup lang="ts">
 import {ref, computed} from 'vue'
-import { Bar, Doughnut, Line } from "vue-chartjs"
+import { Bar, Doughnut } from "vue-chartjs"
 import {
     Chart as ChartJS,
     Title,
