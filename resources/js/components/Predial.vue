@@ -9,12 +9,12 @@
 
             <div class="col-md-6 sombra">
               <h5>Período</h5>
-              <!--
+              
               <input type="date" class="form-control"  v-model="desde">
               <input type="date" class="form-control" v-model="hasta">
               <div class="d-grid gap-2">
                 <button class="btn btn-primary" @click="actualizar" type="button">Actualizar</button>
-              </div>-->
+              </div>
             </div>
 
             <div class="col-md-6 sombra">
@@ -22,11 +22,35 @@
                 <p class="numero">$59.01 M</p>
                 <p class="leyenda">1,824 pagos</p>
             </div>
+
+            <div class="col-md-6 sombra">
+              <h5>Ingreso vs Año Anterior</h5>
+              <Bar
+                id="workhr-chart2"
+                :data="chartData2"
+              >
+              </Bar>
+
+
+            </div>
+
+            <div class="col-md-6 sombra">
+                <h5>Últimos 7 días</h5>
+
+          <LineWithLineChart :data="comparacion" />
+            </div>
+
+             <div class="col-md-12 sombra" style="max-height:450px;">
+                <h5>Distribución de Importes</h5>
+                <Doughnut :data="comparacion" />
+            </div>
            
           </div>
+
+
         </div>
 
-        <div class="col-md-3">
+        <div class="col-md-3 sombra">
 
           <div class="row">
              <h5>Distribución Bancos</h5>
@@ -38,8 +62,10 @@
                 :style="chartStyles"
               >
               </Bar>
+
+               {{info}}
           </div>
-           {{info}}
+          
         </div>
 
         
@@ -53,7 +79,7 @@
 
 <script setup lang="ts">
 import {ref, computed} from 'vue'
-import { Bar } from "vue-chartjs"
+import { Bar, Doughnut, Line } from "vue-chartjs"
 import {
     Chart as ChartJS,
     Title,
@@ -62,14 +88,17 @@ import {
     BarElement,
     CategoryScale,
     LinearScale,
+    ArcElement,
+    LineElement
 } from "chart.js"
 
-const desde = ref('2024-01-01');
-const hasta = ref('2024-01-31');
+const desde = ref('2025-01-02');
+const hasta = ref('2025-01-02');
 
 let info = ref({})
 
-ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale)
+ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale, ArcElement, LineElement)
+
 
 const props = defineProps<{ userHours: {} }>()
 
@@ -81,6 +110,28 @@ const chartData = ref({
             data: [...Object.values([1,2,3,4])] as number[],
             maxBarThickness: 32,
             backgroundColor: "#ffb53c",
+        },
+    ],
+})
+
+const chartData2 = ref({
+    labels: ['2024','2025'],
+    datasets: [
+        {
+            label: ["Comparación de Ingresos"],
+            data: [...Object.values([173300,200152])] as number[],
+            backgroundColor: ["#ff7878",'#62a2f3'],
+        },
+    ],
+})
+
+const comparacion = ref({
+    labels: ['Bancos','Autoservicio', 'Página Web', 'SPEI', 'CODI'],
+    datasets: [
+        {
+            label: ["Distribución de Importes por Método de Pago"],
+            data: [...Object.values([173300,200152, 200152, 200152 , 200152, 200152])] as number[],
+            backgroundColor: ["#ff7878",'#62a2f3','blue','lightgreen','orange','brown'],
         },
     ],
 })
