@@ -42,8 +42,10 @@ class PredialController extends Controller
         $totalImporte = $totalImporte + $row['IMPORTE'];
     }
 
+    $datos['ANIO'] = date('Y');
     $datos['TOTAL'] = $totalPagos;
     $datos['IMPORTE'] = $totalImporte;
+    $datos['IMPORTE_LEYENDA'] = ($totalImporte >= 1000000) ? number_format(round($totalImporte, 2),2) . ' M' : ( ($totalImporte >= 10000 ) ? number_format(round($totalImporte, 2),2) . ' K' :number_format(round($totalImporte, 2),2) . ' pesos' );
 
 
     //Año Anterior
@@ -58,8 +60,10 @@ class PredialController extends Controller
         $totalImporteAnterior = $totalImporteAnterior + $row['IMPORTE'];
     }
 
+    $anteriores['ANIO'] = date('Y') - 1 ;
     $anteriores['TOTAL'] = $totalPagosAnterior;
     $anteriores['IMPORTE'] = $totalImporteAnterior;
+    $anteriores['IMPORTE_LEYENDA'] = ($totalImporteAnterior >= 1000000) ? number_format(round($totalImporteAnterior, 2),2) . ' M' : ( ($totalImporteAnterior >= 10000 ) ? number_format(round($totalImporteAnterior, 2),2) . ' K' :number_format(round($totalImporteAnterior, 2),2) . ' pesos' );
 
 
 
