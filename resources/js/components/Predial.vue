@@ -50,11 +50,11 @@
                   </div>
 
                   <div class="col-md-4 leyendas mt-5">
-                      <p class="">Bancos <strong>$20M</strong></p>
-                      <p class="">Autoservicio <strong>$10M</strong></p>
-                      <p class="">Página Web <strong>$20M</strong></p>
-                      <p class="">SPEI <strong>$5M</strong></p>
-                      <p class="">CODI <strong>$4M</strong></p>
+                      <p class="bancos">Bancos <strong>$20M</strong></p>
+                      <p class="autoservicio">Autoservicio <strong>$10M</strong></p>
+                      <p class="web">Página Web <strong>$20M</strong></p>
+                      <p class="spei">SPEI <strong>$5M</strong></p>
+                      <p class="codi">CODI <strong>$4M</strong></p>
                   </div>
                 </div>
                 
@@ -69,11 +69,11 @@
                   </div>
 
                   <div class="col-md-4 leyendas mt-5">
-                        <p class="">Bancos <strong>500</strong></p>
-                        <p class="">Autoservicio <strong>600</strong></p>
-                        <p class="">Página Web <strong>500</strong></p>
-                        <p class="">SPEI <strong>200</strong></p>
-                        <p class="">CODI <strong>124</strong></p>
+                        <p class="bancos">Bancos <strong>500</strong></p>
+                        <p class="autoservicio">Autoservicio <strong>600</strong></p>
+                        <p class="web">Página Web <strong>500</strong></p>
+                        <p class="spei">SPEI <strong>200</strong></p>
+                        <p class="codi">CODI <strong>124</strong></p>
                   </div>   
                 </div>
                             
@@ -165,8 +165,8 @@ const comparacion = ref({
     datasets: [
         {
             label: ["Distribución de Importes por Método de Pago"],
-            data: [...Object.values([173300,200152, 200152, 200152 , 200152, 200152])] as number[],
-            backgroundColor: ["#ff7878",'#62a2f3','blue','lightgreen','orange','brown'],
+            data: [...Object.values([173300,200152, 200152, 200152 , 200152])] as number[],
+            backgroundColor: ["#c95569",'#6cb9d1','#1cbbb5','orange','orangered'],
         },
     ],
 })
@@ -289,5 +289,21 @@ p.leyenda{
 .leyendas p strong{
   float: right;
   margin-right: 40px;
+}
+
+p.bancos{
+  color: #c95569;
+}
+p.autoservicio{
+  color:#6cb9d1;
+}
+p.web{
+  color:#1cbbb5;
+}
+p.spei{
+  color: orange;
+}
+p.codi{
+  color: orangered;
 }
 </style>
