@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use DB;
+use DateTime, DateInterval, DatePeriod;
 
 class PredialController extends Controller
 {
@@ -37,15 +38,15 @@ class PredialController extends Controller
 
     $totalPagos=0; $totalImporte=0;
     foreach($data as $row) {
-        $datos[] = $row;
+        $datos['detalle'][] = $row;
         $totalPagos = $totalPagos + $row['TOTAL'];
         $totalImporte = $totalImporte + $row['IMPORTE'];
     }
 
     $datos['ANIO'] = date('Y');
-    $datos['TOTAL'] = $totalPagos;
+    $datos['TOTAL'] = number_format($totalPagos);
     $datos['IMPORTE'] = $totalImporte;
-    $datos['IMPORTE_LEYENDA'] = ($totalImporte >= 1000000) ? number_format(round($totalImporte, 2),2) . ' M' : ( ($totalImporte >= 10000 ) ? number_format(round($totalImporte, 2),2) . ' K' :number_format(round($totalImporte, 2),2) . ' pesos' );
+    $datos['IMPORTE_LEYENDA'] = ($totalImporte >= 1000000) ? number_format(round($totalImporte, 2),2) . ' M' : ( ($totalImporte >= 10000 ) ? number_format(round($totalImporte, 2),2) . ' K' :number_format(round($totalImporte, 2),2) . ' MXN' );
 
 
     //Año Anterior
@@ -55,7 +56,7 @@ class PredialController extends Controller
 
     $totalPagosAnterior=0; $totalImporteAnterior=0;
     foreach($anterior as $row) {
-        $anteriores[] = $row;
+        $anteriores['detalle'][] = $row;
         $totalPagosAnterior = $totalPagosAnterior + $row['TOTAL'];
         $totalImporteAnterior = $totalImporteAnterior + $row['IMPORTE'];
     }
@@ -63,7 +64,7 @@ class PredialController extends Controller
     $anteriores['ANIO'] = date('Y') - 1 ;
     $anteriores['TOTAL'] = $totalPagosAnterior;
     $anteriores['IMPORTE'] = $totalImporteAnterior;
-    $anteriores['IMPORTE_LEYENDA'] = ($totalImporteAnterior >= 1000000) ? number_format(round($totalImporteAnterior, 2),2) . ' M' : ( ($totalImporteAnterior >= 10000 ) ? number_format(round($totalImporteAnterior, 2),2) . ' K' :number_format(round($totalImporteAnterior, 2),2) . ' pesos' );
+    $anteriores['IMPORTE_LEYENDA'] = ($totalImporteAnterior >= 1000000) ? number_format(round($totalImporteAnterior, 2),2) . ' M' : ( ($totalImporteAnterior >= 10000 ) ? number_format(round($totalImporteAnterior, 2),2) . ' K' :number_format(round($totalImporteAnterior, 2),2) . ' MXN' );
 
 
 
@@ -73,7 +74,53 @@ class PredialController extends Controller
     $result = $db->select($querySemanal);
     $datosSemanal = $this->utf8_encode_deep($result);
 
-    foreach($datosSemanal as $row) {
+
+    /** SACA LA SEMANA ACTUAL */
+    $fechaInicio = new DateTime($fecha_previa);
+    $fechaFin = new DateTime('now');
+    $intervalo = new DateInterval('P1D');
+    $periodo = new DatePeriod($fechaInicio, $intervalo, $fechaFin);
+
+    $fechas = [];
+    foreach($periodo as $fecha){
+        $fechas[] = $fecha->format('Y-m-d 00:00:00');
+    }
+
+
+    /* SACA LA SEMANA ANTERIOR */
+    $fecha_previaAnterior = new DateTime(date("Y-m-d",strtotime($fecha_previa."- 1 year"))); 
+    $fecha_finAnterior = new DateTime(date("Y-m-d",strtotime($fecha_hoy."- 1 year + 1 days"))); 
+    $intervalo2 = new DateInterval('P1D');
+    $periodo2 = new DatePeriod($fecha_previaAnterior, $intervalo2, $fecha_finAnterior);
+
+    $fechas2 = [];
+    foreach($periodo2 as $fecha){
+        $fechas2[] = $fecha->format('Y-m-d 00:00:00');
+    }
+
+    //return $datosSemanal;
+
+    $ultimados = [];
+    foreach ( $fechas as $element ) {
+
+        foreach( $datosSemanal as $encontrado ){
+            $key = array_search($element, array_column((array)  $datosSemanal, 'fecha'));    
+        }
+
+        if(!$key && $key == ''){
+                $agregar['fecha'] = $element;
+                $agregar['TOTAL'] = 0;
+                $agregar['IMPORTE'] = 0;
+                $ultimados[] = $agregar;
+        }else{
+                $agregar['fecha'] = $element;
+                $agregar['TOTAL'] = $datosSemanal->$key['TOTAL'];
+                $agregar['IMPORTE'] = $datosSemanal->$key['IMPORTE'];
+                $ultimados[] = $agregar;
+        }
+    }
+
+    foreach($ultimados as $row) {
         $row['fecha'] = date("d",strtotime($row['fecha'])) .'-'. $meses[date("m",strtotime($row['fecha'])) - 1];
         $ultimos[] = $row;
     }
@@ -83,11 +130,31 @@ class PredialController extends Controller
     $result = $db->select($querySemanalAnterior);
     $datosSemanalAnterior = $this->utf8_encode_deep($result);
 
-    foreach($datosSemanalAnterior as $row) {
+
+    $ultimados = [];
+    foreach ( $fechas2 as $element ) {
+
+        foreach( $datosSemanalAnterior as $encontrado ){
+            $key = array_search($element, array_column((array)  $datosSemanalAnterior, 'fecha'));    
+        }
+
+        if(!$key && $key == ''){
+                $agregar['fecha'] = $element;
+                $agregar['TOTAL'] = 0;
+                $agregar['IMPORTE'] = 0;
+                $ultimados[] = $agregar;
+        }else{
+                $agregar['fecha'] = $element;
+                $agregar['TOTAL'] = $datosSemanalAnterior->$key['TOTAL'];
+                $agregar['IMPORTE'] = $datosSemanalAnterior->$key['IMPORTE'];
+                $ultimados[] = $agregar;
+        }
+    }
+
+    foreach($ultimados as $row) {
         $row['fecha'] = date("d",strtotime($row['fecha'])) .'-'. $meses[date("m",strtotime($row['fecha'])) - 1];
         $ultimosAnterior[] = $row;
     }
-
     return response()->json([ 'actual' => $datos, 'anterior' => $anteriores, 
                               'ultimos_dias' => $ultimos, 'ultimos_dias_anterior' => $ultimosAnterior]);
 

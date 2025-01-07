@@ -8,7 +8,6 @@
           <div class="row">
 
             <div class="col-md-6 sombra">
-
               <h5>Período</h5>
               <input type="date" class="form-control"  v-model="desde">
               <input type="date" class="form-control" v-model="hasta">
@@ -28,11 +27,10 @@
               <h5>Ingreso vs Año Anterior</h5>
               <Bar
                 id="workhr-chart2"
-                :data="chartData2"
+                :data="chartComparativo"
+                key="{{Math.random()}}"
               >
               </Bar>
-
-
             </div>
 
             <div class="col-md-6 sombra" style="max-height:450px;">
@@ -65,7 +63,7 @@
 
                 <div class="row">
                   <div class="col-md-8">
-                    <Doughnut :data="comparacion" style="max-height:410px;"/>
+                    <Doughnut :data="comparacionPagos" style="max-height:410px;"/>
                   </div>
 
                   <div class="col-md-4 leyendas mt-5">
@@ -90,8 +88,8 @@
              <h5>Distribución Bancos</h5>
            
              <Bar
-                id="workhr-chart2"
-                :data="chartData2"
+                id="workhr-chart3"
+                :data="chartData3"
                 :options="opciones"
               >
               </Bar>
@@ -108,8 +106,8 @@
 </template>
 	
 
-<script setup lang="ts">
-import {ref, computed} from 'vue'
+<script setup>
+import {ref, reactive, computed, watch} from 'vue'
 import { Bar, Doughnut, Line } from "vue-chartjs"
 import {
     Chart as ChartJS,
@@ -122,50 +120,64 @@ import {
     ArcElement,
     LineElement,
     PointElement,
+    Colors
 } from "chart.js"
 
-const desde = ref('2025-01-02');
-const hasta = ref('2025-01-02');
+const desde = ref('2025-01-07');
+const hasta = ref('2025-01-07');
 
 let info = ref({})
 
-ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale, ArcElement, LineElement,PointElement)
-//const props = defineProps<{ userHours: {} }>()
+ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale, ArcElement, LineElement,PointElement, Colors)
 
-const chartData = ref({
-    labels: Object.keys([1,23,54,3]),
-    datasets: [
-        {
-            label: "Worker Hours per Employee",
-            data: [...Object.values([1,2,3,4])] as number[],
-            maxBarThickness: 32,
-            backgroundColor: "#ffb53c",
-        },
-    ],
-})
-
-const chartData2 = ref({
+const chartComparativo = ref({
     labels: ['Ingresos Año Anterior vs Actual'],
     datasets: [
         {
             label: ["2024"],
-            data: [12000] as number[],
+            data: [12000],
             backgroundColor: "#ff7878",
         },
         {
             label: ["2025"],
-            data: [15000] as number[],
+            data: [14000],
             backgroundColor: '#62a2f3',
         },
     ],
 })
 
+const chartData3 = ref({
+    labels: ['Ingresos Año Anterior vs Actual'],
+    datasets: [
+        {
+            label: ["2024"],
+            data: [12000],
+            backgroundColor: "#ff7878",
+        },
+        {
+            label: ["2025"],
+            data: [14000],
+            backgroundColor: '#62a2f3',
+        },
+    ],
+})
 const comparacion = ref({
     labels: ['Bancos','Autoservicio', 'Página Web', 'SPEI', 'CODI'],
     datasets: [
         {
             label: ["Distribución de Importes por Método de Pago"],
-            data: [...Object.values([173300,200152, 200152, 200152 , 200152])] as number[],
+            data: [173300,200152, 200152, 200152 , 200152],
+            backgroundColor: ["#c95569",'#6cb9d1','#1cbbb5','orange','orangered'],
+        },
+    ],
+})
+
+const comparacionPagos = ref({
+    labels: ['Bancos','Autoservicio', 'Página Web', 'SPEI', 'CODI'],
+    datasets: [
+        {
+            label: ["Distribución de Números de Pagos por Método"],
+            data: [173300,200152, 200152, 200152 , 200152],
             backgroundColor: ["#c95569",'#6cb9d1','#1cbbb5','orange','orangered'],
         },
     ],
@@ -206,7 +218,8 @@ const chartStyles = computed(() => {
     }
 })
 
-const data = {
+
+const data = ref({
   labels: ['Ene-1', 'Ene-2', 'Ene-3', 'Ene-4', 'Ene-5', 'Ene-6', 'Ene-7'],
   datasets: [
     {
@@ -220,12 +233,137 @@ const data = {
       data: [40, 49, 11, 31, 9, 80, 40]
     },
   ]
-}
+})
 
 const options = {
   responsive: true,
-  maintainAspectRatio: false
+  maintainAspectRatio: false,
 }
+
+
+watch(info, async (newQuestion, oldQuestion) => {
+
+  console.log(info.value.actual)
+
+  let anioAnterior = info.value.anterior.ANIO
+  let anioActual =info.value.actual.ANIO
+
+  let ingresoAnterior = info.value.anterior.IMPORTE
+  let ingresoActual= info.value.actual.IMPORTE
+
+
+  let diasAnterior = [], totalesAnterior = [], importesAnterior = [];
+  for(let key of info.value.ultimos_dias_anterior) {
+    diasAnterior.push(key.fecha)
+    totalesAnterior.push(key.TOTAL)
+    importesAnterior.push(key.TOTAL)
+  }
+
+  let dias = [], totales = [], importes = [];
+  for(let key of info.value.ultimos_dias) {
+    dias.push(key.fecha)
+    totales.push(key.TOTAL)
+    importes.push(key.TOTAL)
+  }
+
+  const pagina = ["PAGOS EN LINEA"];
+  const bancos = ['BANCOMER', 'BANORTE', 'HSBC', 'SANTANDER','BAJIO','BANAMEX','BANCO AZTECA','SCOTIABANK'];
+  const spei = ['HSBC Spei'];
+  const autoservicio = ['KIOSKO', 'OXXO'];
+
+  let paginaWebImporte = 0, bancosImporte = 0, speiImporte = 0, autoservicioImporte = 0;
+  let paginaWebTotal = 0, bancosTotal = 0, speiTotal = 0, autoservicioTotal = 0;
+  for (let item of info.value.actual.detalle){
+    console.log(item.origen)
+      if (pagina.includes(item.origen)){
+        paginaWebImporte = paginaWebImporte + parseFloat(item.IMPORTE);
+        paginaWebTotal = paginaWebTotal + parseFloat(item.TOTAL);
+      }
+
+      if (bancos.includes(item.origen)){
+        bancosImporte = bancosImporte + parseFloat(item.IMPORTE);
+        bancosTotal = bancosTotal + parseFloat(item.TOTAL);
+      }
+
+      if (spei.includes(item.origen)){
+        speiImporte = speiImporte + parseFloat(item.IMPORTE);
+        speiTotal = speiTotal + parseFloat(item.TOTAL);
+      }
+
+      if (autoservicio.includes(item.origen)){
+        autoservicioImporte = autoservicioImporte + parseFloat(item.IMPORTE);
+        autoservicioTotal = autoservicioTotal + parseFloat(item.TOTAL);
+      }
+
+  }
+
+  comparacion.value = {
+      labels: ['Bancos','Autoservicio', 'Página Web', 'SPEI', 'CODI'],
+      datasets: [
+          {
+              label: ["Distribución de Importes por Método de Pago"],
+              data: [bancosImporte,autoservicioImporte, paginaWebImporte, speiImporte , 0],
+              backgroundColor: ["#c95569",'#6cb9d1','#1cbbb5','orange','orangered'],
+          },
+      ],
+  }
+
+  comparacionPagos.value = {
+    labels: ['Bancos','Autoservicio', 'Página Web', 'SPEI', 'CODI'],
+    datasets: [
+        {
+            label: ["Distribución de Números de Pagos por Método"],
+            data: [bancosTotal,autoservicioTotal, paginaWebTotal, speiTotal , 0],
+            backgroundColor: ["#c95569",'#6cb9d1','#1cbbb5','orange','orangered'],
+        },
+    ],
+}
+
+  console.log(paginaWebImporte)
+
+
+  data.value = {
+  labels: dias,
+  datasets: [
+    {
+      label: '2024',
+      backgroundColor: "#ff7878",
+      data: importesAnterior
+    },
+    {
+      label: '2025',
+      backgroundColor: '#62a2f3',
+      data: importes
+    },
+  ]
+}
+
+
+    //loading.value = true
+      chartComparativo.value = {
+          labels: ['Ingresos Año Anterior vs Actual'],
+          datasets: [
+              {
+                  label: [anioAnterior],
+                  data: [ingresoAnterior],
+                  backgroundColor: "#ff7878",
+              },
+              {
+                  label: [anioActual],
+                  data: [ingresoActual],
+                  backgroundColor: '#62a2f3',
+              },
+          ],
+      };
+
+     
+
+
+
+
+
+  }
+)
 
 
 const opciones = {
@@ -233,16 +371,21 @@ const opciones = {
 }
 
 
+
 function actualizar(){
-  console.log(desde)
+
+
   fetch('http://dashboard.local/get-stats/'+desde.value+'/'+hasta.value)
   .then(data => {
   return data.json();
   })
   .then(json => {
-  info.value = json;
+    info.value = json;
+
   });
 }
+
+
 </script>
 
 
