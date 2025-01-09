@@ -38,6 +38,9 @@ class PredialController extends Controller
 
     $totalPagos=0; $totalImporte=0;
     foreach($data as $row) {
+        $dividida = explode( '.', $row['IMPORTE'] );
+        $dividida[0] = $dividida[0] / 1000000;
+        $row['TOTAL_LEYENDA'] = ($row['IMPORTE'] >= 1000000) ?  bcdiv($dividida[0], '1', 1) . ' M' : ( ($row['IMPORTE'] >= 10000 ) ? bcdiv(($row['IMPORTE'] / 1000), '1', 1) . ' K' :number_format(round($row['IMPORTE'], 2),2) . ' MXN' );
         $datos['detalle'][] = $row;
         $totalPagos = $totalPagos + $row['TOTAL'];
         $totalImporte = $totalImporte + $row['IMPORTE'];
